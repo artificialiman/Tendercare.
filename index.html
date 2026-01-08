@@ -41,29 +41,40 @@
 
   <script src="js/main.js"></script>
   <script>
+    const graduationMedia = [
+      'https://media.giphy.com/media/26u4lOMA8JKSnL9Uk/giphy.gif',
+      'https://media.giphy.com/media/l0MYt5jPR6QX5pnqM/giphy.gif',
+      'https://media.giphy.com/media/3oz8xEdgBBLqBj7LsA/giphy.gif',
+      'https://media.giphy.com/media/26ufcYAkp8e66vanu/giphy.gif',
+      'https://media.giphy.com/media/l0HlHJGHe3yAMhdQY/giphy.gif',
+      'https://media.giphy.com/media/26uf4r3EldfX5Ykqk/giphy.gif',
+      'https://media.giphy.com/media/l0HlQXlQ3nHyLMvte/giphy.gif',
+      'https://media.giphy.com/media/26u4cqiYI30juCOGY/giphy.gif'
+    ];
+
     const students = [
-      { name: "Temi", role: "Head Boy", id: "TCH001" },
-      { name: "Bright", role: "Head Girl", id: "TCH002" },
-      { name: "Prosper", role: null, id: "TCH003" },
-      { name: "Famous", role: null, id: "TCH004" },
-      { name: "Samuel", role: null, id: "TCH005" },
-      { name: "Michael", role: null, id: "TCH006" },
-      { name: "Fauziyyah", role: null, id: "TCH007" },
-      { name: "Mercy", role: null, id: "TCH008" },
-      { name: "Zainab", role: null, id: "TCH009" },
-      { name: "Kaosara", role: null, id: "TCH010" },
-      { name: "Fiyin", role: null, id: "TCH011" },
-      { name: "Enoch", role: null, id: "TCH012" },
-      { name: "Taiwo", role: null, id: "TCH013" },
-      { name: "Bamise", role: null, id: "TCH014" },
-      { name: "Khadija", role: null, id: "TCH015" },
-      { name: "Dorcas", role: null, id: "TCH016" },
-      { name: "Moyin", role: null, id: "TCH017" },
-      { name: "Rokibat", role: null, id: "TCH018" },
-      { name: "Rita", role: null, id: "TCH019" },
-      { name: "Angel", role: null, id: "TCH020" },
-      { name: "Fawaz", role: null, id: "TCH021" },
-      { name: "Habitat", role: null, id: "TCH022" }
+      { name: "Temi", role: "Head Boy", id: "TCH001", media: graduationMedia[0] },
+      { name: "Bright", role: "Head Girl", id: "TCH002", media: graduationMedia[1] },
+      { name: "Prosper", role: null, id: "TCH003", media: graduationMedia[2] },
+      { name: "Famous", role: null, id: "TCH004", media: graduationMedia[3] },
+      { name: "Samuel", role: null, id: "TCH005", media: graduationMedia[4] },
+      { name: "Michael", role: null, id: "TCH006", media: graduationMedia[5] },
+      { name: "Fauziyyah", role: null, id: "TCH007", media: graduationMedia[6] },
+      { name: "Mercy", role: null, id: "TCH008", media: graduationMedia[7] },
+      { name: "Zainab", role: null, id: "TCH009", media: graduationMedia[0] },
+      { name: "Kaosara", role: null, id: "TCH010", media: graduationMedia[1] },
+      { name: "Fiyin", role: null, id: "TCH011", media: graduationMedia[2] },
+      { name: "Enoch", role: null, id: "TCH012", media: graduationMedia[3] },
+      { name: "Taiwo", role: null, id: "TCH013", media: graduationMedia[4] },
+      { name: "Bamise", role: null, id: "TCH014", media: graduationMedia[5] },
+      { name: "Khadija", role: null, id: "TCH015", media: graduationMedia[6] },
+      { name: "Dorcas", role: null, id: "TCH016", media: graduationMedia[7] },
+      { name: "Moyin", role: null, id: "TCH017", media: graduationMedia[0] },
+      { name: "Rokibat", role: null, id: "TCH018", media: graduationMedia[1] },
+      { name: "Rita", role: null, id: "TCH019", media: graduationMedia[2] },
+      { name: "Angel", role: null, id: "TCH020", media: graduationMedia[3] },
+      { name: "Fawaz", role: null, id: "TCH021", media: graduationMedia[4] },
+      { name: "Habitat", role: null, id: "TCH022", media: graduationMedia[5] }
     ];
 
     const grid = document.getElementById('studentGrid');
@@ -79,7 +90,12 @@
       const initials = student.name.substring(0, 2).toUpperCase();
       
       card.innerHTML = `
-        <div class="student-avatar">${initials}</div>
+        <img 
+          src="${student.media}" 
+          alt="${student.name}" 
+          style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover; margin-bottom: 12px;"
+          onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div style="width: 120px; height: 120px; border-radius: 50%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: none; align-items: center; justify-content: center; font-size: 32px; font-weight: bold; color: white; margin-bottom: 12px;">${initials}</div>
         <h3>${student.name}</h3>
         ${student.role ? `<span class="badge badge-gold">${student.role}</span>` : ''}
         <p class="student-id">${student.id}</p>
