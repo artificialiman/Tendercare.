@@ -1,0 +1,87 @@
+@media print {
+  /* Hide non-printable elements */
+  .glass-nav,
+  .back-btn,
+  .breadcrumb,
+  .tabs-container,
+  .action-bar,
+  .no-print {
+    display: none !important;
+  }
+
+  /* Reset backgrounds and effects */
+  body {
+    background: white !important;
+  }
+
+  body::before {
+    display: none !important;
+  }
+
+  * {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+
+  .glass-card,
+  .report-card,
+  .testimonial-card {
+    background: white !important;
+    border: 2px solid #000 !important;
+    box-shadow: none !important;
+    page-break-inside: avoid;
+  }
+
+  /* Page margins */
+  @page {
+    margin: 1.5cm;
+    size: A4;
+  }
+
+  .dashboard-container {
+    max-width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  .stats-grid {
+    display: none !important;
+  }
+
+  /* Report card specific */
+  .report-card {
+    padding: 20px !important;
+    margin-bottom: 20px;
+  }
+
+  .report-header {
+    border-bottom: 3px double #000 !important;
+  }
+
+  .grades-table {
+    border: 2px solid #000 !important;
+  }
+
+  .grades-table th,
+  .grades-table td {
+    border: 1px solid #000 !important;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+
+  /* Testimonial specific */
+  .testimonial-card {
+    page-break-before: always;
+  }
+
+  .school-seal {
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+
+  /* Ensure text is black for printing */
+  .report-card,
+  .testimonial-card {
+    color: #000 !important;
+  }
+}

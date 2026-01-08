@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign In - Tendercare School</title>
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/components.css">
+  <style>
+    .signin-container {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: var(--spacing-md);
+    }
+
+    .signin-card {
+      width: 100%;
+      max-width: 420px;
+      padding: var(--spacing-xl);
+      animation: fadeIn 0.6s ease-out;
+    }
+
+    .signin-header {
+      text-align: center;
+      margin-bottom: var(--spacing-xl);
+    }
+
+    .signin-header .school-crest {
+      width: 80px;
+      height: 80px;
+      margin: 0 auto var(--spacing-md);
+      font-size: 32px;
+    }
+
+    .signin-header h2 {
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: var(--spacing-xs);
+      letter-spacing: 0.5px;
+    }
+
+    .signin-header p {
+      color: var(--text-secondary);
+      font-size: 15px;
+    }
+
+    .form-group {
+      margin-bottom: var(--spacing-md);
+      position: relative;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 16px;
+      border: 2px solid var(--glass-border);
+      border-radius: var(--radius-sm);
+      background: rgba(255, 255, 255, 0.3);
+      backdrop-filter: blur(5px);
+      -webkit-backdrop-filter: blur(5px);
+      font-size: 16px;
+      color: var(--text-primary);
+      transition: var(--transition);
+      outline: none;
+    }
+
+    .form-input:focus {
+      border-color: rgba(102, 126, 234, 0.5);
+      background: rgba(255, 255, 255, 0.4);
+      box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+    }
+
+    .form-input.valid {
+      border-color: rgba(52, 211, 153, 0.5);
+    }
+
+    .form-input.invalid {
+      border-color: rgba(239, 68, 68, 0.5);
+    }
+
+    .form-label {
+      position: absolute;
+      left: 16px;
+      top: 16px;
+      color: var(--text-secondary);
+      font-size: 16px;
+      transition: all 0.3s ease;
+      pointer-events: none;
+      background: transparent;
+      padding: 0 4px;
+    }
+
+    .form-input:focus + .form-label,
+    .form-input:not(:placeholder-shown) + .form-label {
+      top: -10px;
+      left: 12px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-primary);
+      background: linear-gradient(to bottom, transparent 50%, var(--glass-bg) 50%);
+    }
+
+    .password-toggle {
+      position: absolute;
+      right: 16px;
+      top: 16px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--text-secondary);
+      transition: var(--transition);
+    }
+
+    .password-toggle:hover {
+      color: var(--text-primary);
+    }
+
+    .validation-icon {
+      position: absolute;
+      right: 48px;
+      top: 16px;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .form-input.valid ~ .validation-icon.check,
+    .form-input.invalid ~ .validation-icon.x {
+      opacity: 1;
+    }
+
+    .demo-credentials {
+      background: rgba(255, 255, 255, 0.3);
+      padding: var(--spacing-sm);
+      border-radius: var(--radius-sm);
+      margin-bottom: var(--spacing-md);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .demo-credentials strong {
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+
+    .forgot-password {
+      text-align: center;
+      margin-top: var(--spacing-sm);
+    }
+
+    .forgot-password a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 14px;
+      transition: var(--transition);
+    }
+
+    .forgot-password a:hover {
+      color: var(--text-primary);
+    }
+
+    .btn-signin {
+      width: 100%;
+      padding: 16px;
+      margin-top: var(--spacing-md);
+    }
+
+    @media (max-width: 480px) {
+      .signin-card {
+        padding: var(--spacing-md);
+      }
+      
+      .signin-header h2 {
+        font-size: 24px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <button class="back-btn" onclick="history.back()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M19 12H5M12 19l-7-7 7-7"/>
+    </svg>
+  </button>
+
+  <div class="signin-container">
+    <div class="signin-card glass-card">
+      <div class="signin-header">
+        <div class="school-crest"></div>
+        <h2>Welcome Back</h2>
+        <p>Sign in to access your results</p>
+      </div>
+
+      <div class="demo-credentials">
+        <strong>Demo Credentials:</strong><br>
+        Student ID: Any student ID from yearbook<br>
+        Password: demo123
+      </div>
+
+      <form id="signinForm" onsubmit="handleSignin(event)">
+        <div class="form-group">
+          <input 
+            type="text" 
+            id="studentId" 
+            class="form-input" 
+            placeholder=" "
+            oninput="validateStudentId(this)"
+            required
+          >
+          <label class="form-label" for="studentId">Student ID</label>
+          <svg class="validation-icon check" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="3">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+          <svg class="validation-icon x" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="3">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </div>
+
+        <div class="form-group">
+          <input 
+            type="password" 
+            id="password" 
+            class="form-input" 
+            placeholder=" "
+            oninput="validatePassword(this)"
+            required
+          >
+          <label class="form-label" for="password">Password</label>
+          <button type="button" class="password-toggle" onclick="togglePassword()">
+            <svg id="eyeIcon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+              <circle cx="12" cy="12" r="3"></circle>
+            </svg>
+          </button>
+          <svg class="validation-icon check" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="3">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+          <svg class="validation-icon x" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="3">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </div>
+
+        <button type="submit" class="btn-primary btn-signin">Sign In</button>
+      </form>
+
+      <div class="forgot-password">
+        <a href="#">Forgot Password?</a>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast">
+    <div class="toast-icon">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+        <polyline points="20 6 9 17 4 12"></polyline>
+      </svg>
+    </div>
+    <div class="toast-content">
+      <h4>Welcome back!</h4>
+      <p id="toastMessage"></p>
+    </div>
+  </div>
+
+  <script>
+    const validStudentIds = [
+      'TCH001', 'TCH002', 'TCH003', 'TCH004', 'TCH005', 'TCH006',
+      'TCH007', 'TCH008', 'TCH009', 'TCH010', 'TCH011', 'TCH012',
+      'TCH013', 'TCH014', 'TCH015', 'TCH016', 'TCH017', 'TCH018',
+      'TCH019', 'TCH020', 'TCH021', 'TCH022'
+    ];
+
+    function validateStudentId(input) {
+      const value = input.value.trim().toUpperCase();
+      if (value.length > 0) {
+        if (validStudentIds.includes(value)) {
+          input.classList.remove('invalid');
+          input.classList.add('valid');
+        } else {
+          input.classList.remove('valid');
+          input.classList.add('invalid');
+        }
+      } else {
+        input.classList.remove('valid', 'invalid');
+      }
+    }
+
+    function validatePassword(input) {
+      const value = input.value;
+      if (value.length >= 6) {
+        input.classList.remove('invalid');
+        input.classList.add('valid');
+      } else if (value.length > 0) {
+        input.classList.remove('valid');
+        input.classList.add('invalid');
+      } else {
+        input.classList.remove('valid', 'invalid');
+      }
+    }
+
+    function togglePassword() {
+      const passwordInput = document.getElementById('password');
+      const eyeIcon = document.getElementById('eyeIcon');
+      
+      if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        eyeIcon.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line>';
+      } else {
+        passwordInput.type = 'password';
+        eyeIcon.innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle>';
+      }
+    }
+
+    function showToast(studentId) {
+      const toast = document.getElementById('toast');
+      const message = document.getElementById('toastMessage');
+      message.textContent = `Signed in as ${studentId}`;
+      
+      toast.classList.add('show');
+      
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 3000);
+    }
+
+    function handleSignin(event) {
+      event.preventDefault();
+      
+      const studentId = document.getElementById('studentId').value.trim().toUpperCase();
+      const password = document.getElementById('password').value;
+      
+      if (validStudentIds.includes(studentId) && password === 'demo123') {
+        sessionStorage.setItem('signedInStudent', studentId);
+        showToast(studentId);
+        
+        setTimeout(() => {
+          location.href = 'dashboard.html';
+        }, 1500);
+      } else {
+        alert('Invalid credentials. Please use a valid Student ID from the yearbook and password: demo123');
+      }
+    }
+  </script>
+</body>
+</html>
