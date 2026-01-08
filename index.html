@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SS3 Science Class - Tendercare School</title>
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/components.css">
+</head>
+<body>
+  <nav class="glass-nav">
+    <div class="nav-content">
+      <div class="nav-left">
+        <div class="school-crest"></div>
+        <div class="nav-text">
+          <h1>Tendercare School</h1>
+          <p>SS3 Science Class • 2025/26</p>
+        </div>
+      </div>
+      <button class="btn-primary" onclick="location.href='signin.html'">Sign In</button>
+    </div>
+  </nav>
+
+  <main class="yearbook-container">
+    <div class="yearbook-header">
+      <h2>Graduating Class of 2025/26</h2>
+      <p>Science Division</p>
+      <div class="search-bar glass-card">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"></circle>
+          <path d="m21 21-4.35-4.35"></path>
+        </svg>
+        <input type="text" id="searchInput" placeholder="Search students...">
+      </div>
+    </div>
+
+    <div class="student-grid" id="studentGrid">
+      <!-- Students will be populated by JavaScript -->
+    </div>
+  </main>
+
+  <script src="js/main.js"></script>
+  <script>
+    const students = [
+      { name: "Temi", role: "Head Boy", id: "TCH001" },
+      { name: "Bright", role: "Head Girl", id: "TCH002" },
+      { name: "Prosper", role: null, id: "TCH003" },
+      { name: "Famous", role: null, id: "TCH004" },
+      { name: "Samuel", role: null, id: "TCH005" },
+      { name: "Michael", role: null, id: "TCH006" },
+      { name: "Fauziyyah", role: null, id: "TCH007" },
+      { name: "Mercy", role: null, id: "TCH008" },
+      { name: "Zainab", role: null, id: "TCH009" },
+      { name: "Kaosara", role: null, id: "TCH010" },
+      { name: "Fiyin", role: null, id: "TCH011" },
+      { name: "Enoch", role: null, id: "TCH012" },
+      { name: "Taiwo", role: null, id: "TCH013" },
+      { name: "Bamise", role: null, id: "TCH014" },
+      { name: "Khadija", role: null, id: "TCH015" },
+      { name: "Dorcas", role: null, id: "TCH016" },
+      { name: "Moyin", role: null, id: "TCH017" },
+      { name: "Rokibat", role: null, id: "TCH018" },
+      { name: "Rita", role: null, id: "TCH019" },
+      { name: "Angel", role: null, id: "TCH020" },
+      { name: "Fawaz", role: null, id: "TCH021" },
+      { name: "Habitat", role: null, id: "TCH022" }
+    ];
+
+    const grid = document.getElementById('studentGrid');
+    
+    students.forEach(student => {
+      const card = document.createElement('div');
+      card.className = 'student-card glass-card';
+      card.onclick = () => {
+        sessionStorage.setItem('selectedStudent', JSON.stringify(student));
+        location.href = 'profile.html';
+      };
+      
+      const initials = student.name.substring(0, 2).toUpperCase();
+      
+      card.innerHTML = `
+        <div class="student-avatar">${initials}</div>
+        <h3>${student.name}</h3>
+        ${student.role ? `<span class="badge badge-gold">${student.role}</span>` : ''}
+        <p class="student-id">${student.id}</p>
+      `;
+      
+      grid.appendChild(card);
+    });
+
+    // Search functionality
+    document.getElementById('searchInput').addEventListener('input', (e) => {
+      const searchTerm = e.target.value.toLowerCase();
+      const cards = document.querySelectorAll('.student-card');
+      
+      cards.forEach(card => {
+        const name = card.querySelector('h3').textContent.toLowerCase();
+        if (name.includes(searchTerm)) {
+          card.style.display = 'flex';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    });
+  </script>
+</body>
+</html>
