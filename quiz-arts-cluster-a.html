@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>Arts — ELGC — JAMB Practice · GrantApp AI</title>
+    <link rel="stylesheet" href="quiz-styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* minimal inline fallback for structure – external quiz-styles.css assumed */
+        .quiz-body { background: #0a0c12; color: #eee; font-family: system-ui, -apple-system, sans-serif; margin: 0; }
+        .hidden { display: none !important; }
+        .btn { padding: 0.5rem 1rem; border-radius: 2rem; border: none; font-weight: 500; cursor: pointer; }
+        .btn-primary { background: #4f46e5; color: white; }
+        .btn-secondary { background: #262b36; color: #ccc; }
+        .btn-danger { background: #b91c1c; color: white; }
+        .btn-icon { background: none; border: none; color: #aaa; font-size: 1.2rem; cursor: pointer; }
+        .quiz-header { background: #12141c; border-bottom: 1px solid #1e1e2e; padding: 0.5rem 1rem; position: sticky; top:0; z-index:10; }
+        .quiz-header-container { display: flex; justify-content: space-between; align-items: center; max-width: 1400px; margin: 0 auto; }
+        .quiz-header-left { display: flex; align-items: center; gap: 1rem; }
+        .subject-name { font-weight: 600; }
+        .subject-meta { font-size: 0.8rem; color: #aaa; }
+        .quiz-timer-container { display: flex; align-items: center; gap: 0.5rem; background: #1e1e2e; padding: 0.25rem 1rem; border-radius: 2rem; }
+        .timer-display { font-weight: 600; letter-spacing: 1px; }
+        .timer-progress-ring { width: 32px; height: 32px; position: relative; }
+        .quiz-container { display: flex; max-width: 1400px; margin: 0 auto; padding: 1rem; gap: 1rem; }
+        .quiz-sidebar { width: 260px; background: #12141c; border-radius: 1rem; padding: 1rem; display: flex; flex-direction: column; gap: 1rem; }
+        .sidebar-stats { display: flex; justify-content: space-between; }
+        .stat-item { text-align: center; }
+        .stat-value { font-size: 1.4rem; font-weight: 700; }
+        .stat-label { font-size: 0.75rem; color: #aaa; }
+        .question-palette { display: grid; grid-template-columns: repeat(5,1fr); gap: 0.5rem; }
+        .palette-item { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; background: #1e1e2e; border-radius: 0.4rem; font-size: 0.8rem; cursor: pointer; }
+        .palette-item.current { border: 2px solid #4f46e5; }
+        .palette-item.answered { background: #2e7d32; color:white; }
+        .palette-item.flagged { background: #b45309; color:white; }
+        .palette-item.flagged.answered { background: #b45309; background: linear-gradient(135deg, #2e7d32 50%, #b45309 50%); }
+        .sidebar-legend { display: flex; flex-wrap: wrap; gap: 1rem; font-size: 0.7rem; }
+        .legend-dot { width: 12px; height: 12px; border-radius: 4px; display: inline-block; background: #1e1e2e; margin-right: 4px; }
+        .legend-dot.current { border:2px solid #4f46e5; background: transparent; }
+        .legend-dot.answered { background: #2e7d32; }
+        .legend-dot.flagged { background: #b45309; }
+        .quiz-main { flex: 1; }
+        .question-card { background: #12141c; border-radius: 1rem; padding: 2rem; margin-bottom: 1rem; }
+        .question-header { display: flex; justify-content: space-between; margin-bottom: 1.5rem; }
+        .question-number { font-size: 1.1rem; color: #4f46e5; }
+        .btn-flag { background: none; border: 1px solid #3b3b4a; border-radius: 2rem; padding: 0.4rem 1rem; color: #aaa; cursor: pointer; }
+        .btn-flag i { margin-right: 0.4rem; }
+        .question-text { font-size: 1.2rem; font-weight: 500; margin-bottom: 2rem; }
+        .options-container { display: flex; flex-direction: column; gap: 1rem; margin-bottom: 2rem; }
+        .option { background: #1a1c26; border-radius: 1rem; padding: 1rem; display: flex; align-items: center; gap: 1rem; cursor: pointer; border: 1px solid transparent; }
+        .option.selected { border-color: #4f46e5; background: #262b40; }
+        .option-letter { width: 2rem; height: 2rem; background: #2d2f3a; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; }
+        .option-text { flex:1; }
+        .question-explanation { background: #1a1f2a; border-radius: 1rem; padding: 1rem; margin-top: 1rem; border-left: 4px solid #4f46e5; }
+        .quiz-navigation { display: flex; gap: 1rem; justify-content: space-between; }
+        .modal-overlay { position: fixed; inset:0; background: rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center; z-index:1000; }
+        .modal { background: #12141c; border-radius: 1.5rem; max-width: 400px; width: 90%; padding: 1.5rem; }
+        .modal-header { display: flex; justify-content: space-between; margin-bottom: 1rem; }
+        .calculator-modal .modal-body { padding: 0; }
+        .calculator { background: #1a1c26; border-radius: 1rem; overflow: hidden; }
+        .calculator-display { width: 100%; padding: 1.5rem; background: #0e0f16; border: none; color: white; font-size: 2rem; text-align: right; outline: none; }
+        .calculator-buttons { display: grid; grid-template-columns: repeat(4,1fr); gap: 1px; background: #2a2d3a; }
+        .calc-btn { background: #1e212c; border: none; padding: 1.2rem; color: white; font-size: 1.2rem; cursor: pointer; }
+        .calc-equals { background: #4f46e5; grid-row: span 2; }
+        .mobile-palette-trigger { display: none; position: fixed; bottom: 80px; right: 16px; background: #4f46e5; padding: 0.8rem 1.2rem; border-radius: 2rem; box-shadow: 0 4px 12px #000; z-index: 100; }
+        @media (max-width: 768px) { .quiz-sidebar { display: none; } .mobile-palette-trigger { display: flex; align-items: center; gap: 8px; } .quiz-container { padding: 0.5rem; } }
+    </style>
+</head>
+<body class="quiz-body">
+
+<!-- ========== FRESH QUESTION BANK (ARTS – ELGC) – FULLY REPLACED, SAME STRUCTURE ========== -->
+<script>
+const DURATION = 3600;
+
+const QUESTIONS = [
+    /* ========== ENGLISH (1–35) ========== */
+    { id: 1, subject: 'English', text: 'Choose the word that is OPPOSITE in meaning to "ephemeral".', options: { A: 'Brief', B: 'Permanent', C: 'Fleeting', D: 'Temporary' }, answer: 'B', explanation: 'Ephemeral means short-lived; permanent is the opposite.' },
+    { id: 2, subject: 'English', text: 'Select the option with the same vowel sound as "bear".', options: { A: 'Fear', B: 'Fare', C: 'Near', D: 'Hear' }, answer: 'B', explanation: 'Bear and fare share the /eə/ sound.' },
+    { id: 3, subject: 'English', text: 'In "The jury are divided in their opinions", the verb "are" agrees with:', options: { A: 'jury (collective plural idea)', B: 'opinions', C: 'the subject complement', D: 'implied "members"' }, answer: 'A', explanation: 'When collective noun indicates individual action, plural verb is used.' },
+    { id: 4, subject: 'English', text: 'Identify the literary device: "The pen is mightier than the sword."', options: { A: 'Metonymy', B: 'Oxymoron', C: 'Synecdoche', D: 'Irony' }, answer: 'A', explanation: 'Pen represents writing, sword represents military force – metonymy.' },
+    { id: 5, subject: 'English', text: 'Which sentence uses "effect" correctly?', options: { A: 'The new law will effect the economy.', B: 'The effect of the medicine was immediate.', C: 'We need to effect change quickly.', D: 'Both B and C' }, answer: 'D', explanation: 'Effect as noun (result) or verb (to bring about) – both are correct in B and C.' },
+    { id: 6, subject: 'English', text: 'Choose the correctly punctuated sentence:', options: { A: 'She asked, "when does the bus leave"?', B: 'She asked "when does the bus leave?"', C: 'She asked, "When does the bus leave?"', D: 'She asked: "When does the bus leave?"' }, answer: 'C', explanation: 'Comma before quote, capital letter, question mark inside quotes.' },
+    { id: 7, subject: 'English', text: 'Identify the error: "Every one of the players have arrived."', options: { A: 'Verb tense', B: 'Subject-verb agreement', C: 'Pronoun agreement', D: 'No error' }, answer: 'B', explanation: 'Every one is singular, so should be "has arrived".' },
+    { id: 8, subject: 'English', text: 'The prefix "post-" in "posthumous" means:', options: { A: 'before', B: 'after', C: 'during', D: 'beyond' }, answer: 'B', explanation: 'Posthumous = after death.' },
+    { id: 9, subject: 'English', text: 'Choose the correctly spelled word:', options: { A: 'Accommodate', B: 'Acommodate', C: 'Accommodatie', D: 'Acomodate' }, answer: 'A', explanation: 'Double c, double m – accommodate.' },
+    { id: 10, subject: 'English', text: '"No sooner had he arrived _____ he fell ill."', options: { A: 'than', B: 'then', C: 'when', D: 'that' }, answer: 'A', explanation: 'No sooner ... than – correct correlative.' },
+    { id: 11, subject: 'English', text: 'Identify the correct pronoun: "Neither of the girls brought _____ umbrella."', options: { A: 'their', B: 'his', C: 'her', D: 'its' }, answer: 'C', explanation: 'Neither (singular) + feminine reference → her.' },
+    { id: 12, subject: 'English', text: 'The word "cleave" is an example of a:', options: { A: 'contranym', B: 'homophone', C: 'euphemism', D: 'cognate' }, answer: 'A', explanation: 'Cleave can mean to split or to cling – opposite meanings.' },
+    { id: 13, subject: 'English', text: 'Which uses the subjunctive correctly?', options: { A: 'I suggest that he goes early.', B: 'It is important that she be present.', C: 'If I was you, I would wait.', D: 'She insisted that he stays.' }, answer: 'B', explanation: 'Subjunctive uses base form "be" after verbs like suggest/insist.' },
+    { id: 14, subject: 'English', text: 'Identify the misplaced modifier: "Covered in frosting, the child devoured the cupcake."', options: { A: 'Covered in frosting (illogically modifies child)', B: 'No modifier', C: 'devoured – wrong tense', D: 'cupcake should be plural' }, answer: 'A', explanation: 'It sounds like the child was covered in frosting.' },
+    { id: 15, subject: 'English', text: 'The word "nice" once meant foolish; now it means pleasant. This semantic change is called:', options: { A: 'Pejoration', B: 'Amelioration', C: 'Generalization', D: 'Specialization' }, answer: 'B', explanation: 'Amelioration = meaning becomes more positive.' },
+    { id: 16, subject: 'English', text: 'Choose the correct form: "He is taller than _____."', options: { A: 'me', B: 'I', C: 'myself', D: 'mine' }, answer: 'B', explanation: 'Formal: than I (am).' },
+    { id: 17, subject: 'English', text: 'Which sentence has parallel structure?', options: { A: 'She enjoys hiking, to swim, and biking.', B: 'She enjoys hiking, swimming, and biking.', C: 'She enjoys to hike, to swim, and biking.', D: 'She enjoys hiking, and to swim.' }, answer: 'B', explanation: 'All gerunds.' },
+    { id: 18, subject: 'English', text: 'The phrase "literally" is often misused as:', options: { A: 'figuratively', B: 'intensifier', C: 'both', D: 'none' }, answer: 'B', explanation: 'It is now used for emphasis even in non-literal contexts.' },
+    { id: 19, subject: 'English', text: 'Identify the paradox: "I must be cruel to be kind."', options: { A: 'Oxymoron', B: 'Paradox', C: 'Antithesis', D: 'Simile' }, answer: 'B', explanation: 'Self-contradictory statement that reveals truth.' },
+    { id: 20, subject: 'English', text: 'Change to active voice: "The ball was caught by the fielder."', options: { A: 'The fielder caught the ball.', B: 'The fielder has caught the ball.', C: 'The ball was caught.', D: 'The fielder did catch the ball.' }, answer: 'A', explanation: 'Simple past active.' },
+    { id: 21, subject: 'English', text: 'Choose correct comma usage: "We visited Paris France in July."', options: { A: 'We visited Paris, France in July.', B: 'We visited Paris, France, in July.', C: 'We visited Paris France, in July.', D: 'We visited Paris, France in, July.' }, answer: 'B', explanation: 'Comma between city and country, and after country if sentence continues.' },
+    { id: 22, subject: 'English', text: 'Error: "The reason he left is because he was tired."', options: { A: 'Redundancy', B: 'Verb tense', C: 'No error', D: 'Wrong pronoun' }, answer: 'A', explanation: 'Reason ... because is redundant; use "that".' },
+    { id: 23, subject: 'English', text: '"Phenomena" is the plural of:', options: { A: 'phenomenon', B: 'phenomenum', C: 'phenomenos', D: 'phenomen' }, answer: 'A', explanation: 'Greek origin: phenomenon (sg), phenomena (pl).' },
+    { id: 24, subject: 'English', text: 'Identify malapropism: "He was a man of great statue."', options: { A: 'statue instead of stature', B: 'great misused', C: 'man should be person', D: 'no error' }, answer: 'A', explanation: 'Statue (carving) vs stature (status).' },
+    { id: 25, subject: 'English', text: '"Who did you see?" – this is:', options: { A: 'informal but common', B: 'grammatically correct', C: 'archaic', D: 'formal standard' }, answer: 'A', explanation: 'Whom is correct object, but "who" is widely accepted in conversation.' },
+    { id: 26, subject: 'English', text: 'If I _____ you, I would apologize.', options: { A: 'was', B: 'were', C: 'am', D: 'be' }, answer: 'B', explanation: 'Subjunctive for contrary-to-fact: were.' },
+    { id: 27, subject: 'English', text: '"Enervate" means:', options: { A: 'to energize', B: 'to weaken', C: 'to strengthen', D: 'to annoy' }, answer: 'B', explanation: 'Enervate = drain energy.' },
+    { id: 28, subject: 'English', text: 'In "It is I who _____ responsible," the correct verb is:', options: { A: 'is', B: 'am', C: 'are', D: 'be' }, answer: 'B', explanation: 'Antecedent of "who" is I → am.' },
+    { id: 29, subject: 'English', text: 'Split infinitive example:', options: { A: 'To always be happy', B: 'Always to be happy', C: 'To be always happy', D: 'Happy to always be' }, answer: 'A', explanation: 'to + adverb + verb.' },
+    { id: 30, subject: 'English', text: '"Fulsome praise" means:', options: { A: 'abundant and sincere', B: 'excessive and insincere', C: 'minimal', D: 'well-deserved' }, answer: 'B', explanation: 'Fulsome often negative: excessive, cloying.' },
+    { id: 31, subject: 'English', text: 'Choose correct: "One of the boys _____ locked out."', options: { A: 'were', B: 'was', C: 'are', D: 'have been' }, answer: 'B', explanation: 'One (singular) + of the boys → was.' },
+    { id: 32, subject: 'English', text: 'Identify the function of "swimming" in "Swimming is fun."', options: { A: 'gerund', B: 'participle', C: 'infinitive', D: 'verb' }, answer: 'A', explanation: 'Swimming = subject (gerund).' },
+    { id: 33, subject: 'English', text: 'The sentence "He goed to school" is:', options: { A: 'child language (overregularization)', B: 'dialect', C: 'error only', D: 'archaic' }, answer: 'A', explanation: 'Child applies regular -ed pattern.' },
+    { id: 34, subject: 'English', text: 'Zeugma: "He lost his temper and his wallet."', options: { A: 'two meanings of lost', B: 'simile', C: 'personification', D: 'litotes' }, answer: 'A', explanation: 'Lost applies literally and figuratively.' },
+    { id: 35, subject: 'English', text: 'Onomatopoeia example:', options: { A: 'buzz', B: 'light', C: 'tree', D: 'run' }, answer: 'A', explanation: 'Buzz imitates sound.' },
+
+    /* ========== LITERATURE (36–70) ========== */
+    { id: 36, subject: 'Literature', text: 'A traditional story explaining natural phenomena is a:', options: { A: 'Myth', B: 'Legend', C: 'Fable', D: 'Ballad' }, answer: 'A' },
+    { id: 37, subject: 'Literature', text: '“All the world’s a stage” is an example of:', options: { A: 'Metaphor', B: 'Simile', C: 'Personification', D: 'Apostrophe' }, answer: 'A' },
+    { id: 38, subject: 'Literature', text: 'A play with exaggerated emotions and simplistic characters:', options: { A: 'Melodrama', B: 'Farce', C: 'Tragedy', D: 'Comedy of manners' }, answer: 'A' },
+    { id: 39, subject: 'Literature', text: 'The character who opposes the protagonist:', options: { A: 'Antagonist', B: 'Foil', C: 'Narrator', D: 'Confidant' }, answer: 'A' },
+    { id: 40, subject: 'Literature', text: 'Author of “Weep Not, Child”?', options: { A: 'Ngugi wa Thiong’o', B: 'Chinua Achebe', C: 'Mongo Beti', D: 'Ferdinand Oyono' }, answer: 'A' },
+    { id: 41, subject: 'Literature', text: '“O heavy lightness” is an:', options: { A: 'Oxymoron', B: 'Paradox', C: 'Irony', D: 'Antithesis' }, answer: 'A' },
+    { id: 42, subject: 'Literature', text: 'Repetition of vowel sounds:', options: { A: 'Assonance', B: 'Consonance', C: 'Alliteration', D: 'Rhyme' }, answer: 'A' },
+    { id: 43, subject: 'Literature', text: 'A 14‑line poem with a turn:', options: { A: 'Sonnet', B: 'Villanelle', C: 'Sestina', D: 'Haiku' }, answer: 'A' },
+    { id: 44, subject: 'Literature', text: 'The emotional atmosphere of a work:', options: { A: 'Mood', B: 'Tone', C: 'Voice', D: 'Style' }, answer: 'A' },
+    { id: 45, subject: 'Literature', text: 'In drama, a long speech by one character alone:', options: { A: 'Soliloquy', B: 'Monologue', C: 'Aside', D: 'Dialogue' }, answer: 'A' },
+    { id: 46, subject: 'Literature', text: 'The central idea of a story:', options: { A: 'Theme', B: 'Plot', C: 'Motif', D: 'Leitmotif' }, answer: 'A' },
+    { id: 47, subject: 'Literature', text: 'Who wrote “The Interpreters”?', options: { A: 'Wole Soyinka', B: 'J.P. Clark', C: 'Christopher Okigbo', D: 'Ben Okri' }, answer: 'A' },
+    { id: 48, subject: 'Literature', text: 'A long narrative poem about heroic deeds:', options: { A: 'Epic', B: 'Lay', C: 'Ballad', D: 'Romance' }, answer: 'A' },
+    { id: 49, subject: 'Literature', text: 'Pattern of stressed/unstressed syllables:', options: { A: 'Meter', B: 'Rhythm', C: 'Feet', D: 'Cadence' }, answer: 'A' },
+    { id: 50, subject: 'Literature', text: 'Giving human traits to an animal:', options: { A: 'Personification', B: 'Anthropomorphism', C: 'Zoomorphism', D: 'Pathetic fallacy' }, answer: 'B' }, // deliberate switch? keep fresh: correct = anthropomorphism, but personification is also common. use B for accuracy.
+    { id: 51, subject: 'Literature', text: 'The locale of a story:', options: { A: 'Setting', B: 'Milieu', C: 'Background', D: 'Scene' }, answer: 'A' },
+    { id: 52, subject: 'Literature', text: 'A poem of mourning:', options: { A: 'Elegy', B: 'Threnody', C: 'Dirge', D: 'Lament' }, answer: 'A' },
+    { id: 53, subject: 'Literature', text: 'Narrator who knows all:', options: { A: 'Omniscient', B: 'Limited', C: 'Unreliable', D: 'Stream of consciousness' }, answer: 'A' },
+    { id: 54, subject: 'Literature', text: 'Struggle between opposing forces:', options: { A: 'Conflict', B: 'Suspense', C: 'Climax', D: 'Denouement' }, answer: 'A' },
+    { id: 55, subject: 'Literature', text: 'Who wrote “The Marriage of Anansewa”?', options: { A: 'Efua Sutherland', B: 'Ama Ata Aidoo', C: 'Sofola', D: 'Clark' }, answer: 'A' },
+    { id: 56, subject: 'Literature', text: 'Use of symbols to represent ideas:', options: { A: 'Symbolism', B: 'Allegory', C: 'Imagery', D: 'Archetype' }, answer: 'A' },
+    { id: 57, subject: 'Literature', text: 'The one who tells the story:', options: { A: 'Narrator', B: 'Speaker', C: 'Voice', D: 'Persona' }, answer: 'A' },
+    { id: 58, subject: 'Literature', text: 'Light, humorous play with exaggerated plot:', options: { A: 'Farce', B: 'Comedy', C: 'Satire', D: 'Burlesque' }, answer: 'A' },
+    { id: 59, subject: 'Literature', text: 'Repetition of consonant sounds in nearby words:', options: { A: 'Consonance', B: 'Alliteration', C: 'Assonance', D: 'Cacophony' }, answer: 'A' },
+    { id: 60, subject: 'Literature', text: 'Words spoken by a character unheard by others:', options: { A: 'Aside', B: 'Soliloquy', C: 'Monologue', D: 'Chorus' }, answer: 'A' },
+    { id: 61, subject: 'Literature', text: 'Author of “The Beautyful Ones Are Not Yet Born”?', options: { A: 'Ayi Kwei Armah', B: 'Kofi Awoonor', C: 'Ama Ata Aidoo', D: 'Ayi Kwei Armah' }, answer: 'A' },
+    { id: 62, subject: 'Literature', text: 'Brief story with animal characters, moral lesson:', options: { A: 'Fable', B: 'Parable', C: 'Apologue', D: 'Allegory' }, answer: 'A' },
+    { id: 63, subject: 'Literature', text: 'Point of highest tension:', options: { A: 'Climax', B: 'Crisis', C: 'Turning point', D: 'Peripeteia' }, answer: 'A' },
+    { id: 64, subject: 'Literature', text: 'Words that imitate sounds:', options: { A: 'Onomatopoeia', B: 'Echoism', C: 'Sound symbolism', D: 'Phonesthesia' }, answer: 'A' },
+    { id: 65, subject: 'Literature', text: 'Who wrote “So Long a Letter”?', options: { A: 'Mariama Bâ', B: 'Aminata Sow Fall', C: 'Ken Bugul', D: 'Nawal El Saadawi' }, answer: 'A' },
+    { id: 66, subject: 'Literature', text: 'Saying the opposite of what is meant:', options: { A: 'Irony', B: 'Sarcasm', C: 'Satire', D: 'Understatement' }, answer: 'A' },
+    { id: 67, subject: 'Literature', text: 'Short religious story teaching a moral:', options: { A: 'Parable', B: 'Homily', C: 'Exemplum', D: 'Fable' }, answer: 'A' },
+    { id: 68, subject: 'Literature', text: 'Sequence of events in a story:', options: { A: 'Plot', B: 'Storyline', C: 'Narrative', D: 'Action' }, answer: 'A' },
+    { id: 69, subject: 'Literature', text: 'Group of lines forming a unit in a poem:', options: { A: 'Stanza', B: 'Verse paragraph', C: 'Canto', D: 'Section' }, answer: 'A' },
+    { id: 70, subject: 'Literature', text: 'Author of “The Joys of Motherhood”?', options: { A: 'Buchi Emecheta', B: 'Flora Nwapa', C: 'Chimamanda Adichie', D: 'Zaynab Alkali' }, answer: 'A' },
+
+    /* ========== GOVERNMENT (71–105) ========== */
+    { id: 71, subject: 'Government', text: 'Government by the few for the few:', options: { A: 'Oligarchy', B: 'Plutocracy', C: 'Aristocracy', D: 'Timocracy' }, answer: 'A' },
+    { id: 72, subject: 'Government', text: 'The body of fundamental laws:', options: { A: 'Constitution', B: 'Statute', C: 'Act', D: 'Decree' }, answer: 'A' },
+    { id: 73, subject: 'Government', text: 'Separation of powers theorist:', options: { A: 'Montesquieu', B: 'Locke', C: 'Hobbes', D: 'Rousseau' }, answer: 'A' },
+    { id: 74, subject: 'Government', text: 'Federal system shares power between:', options: { A: 'Central and regional govts', B: 'Executive and judiciary', C: 'Upper and lower houses', D: 'Military and civilian' }, answer: 'A' },
+    { id: 75, subject: 'Government', text: 'Right to vote is called:', options: { A: 'Suffrage', B: 'Franchise', C: 'Both A and B', D: 'Electorate' }, answer: 'C' },
+    { id: 76, subject: 'Government', text: 'Interprets laws:', options: { A: 'Judiciary', B: 'Executive', C: 'Legislature', D: 'Civil service' }, answer: 'A' },
+    { id: 77, subject: 'Government', text: 'Year of Nigeria’s independence:', options: { A: '1960', B: '1963', C: '1959', D: '1966' }, answer: 'A' },
+    { id: 78, subject: 'Government', text: 'Checks and balances prevent:', options: { A: 'Abuse of power', B: 'Democracy', C: 'Rule of law', D: 'Federalism' }, answer: 'A' },
+    { id: 79, subject: 'Government', text: 'Citizens vote on laws directly:', options: { A: 'Direct democracy', B: 'Representative democracy', C: 'Plebiscitary democracy', D: 'Participatory democracy' }, answer: 'A' },
+    { id: 80, subject: 'Government', text: 'Head of state in parliamentary system:', options: { A: 'Monarch or ceremonial president', B: 'Prime minister', C: 'Chancellor', D: 'Speaker' }, answer: 'A' },
+    { id: 81, subject: 'Government', text: 'Law passed by legislature:', options: { A: 'Act', B: 'Bill', C: 'Decree', D: 'Edict' }, answer: 'A' },
+    { id: 82, subject: 'Government', text: 'Bill becomes law after:', options: { A: 'Three readings and assent', B: 'First reading', C: 'Presidential proclamation', D: 'Gazetting' }, answer: 'A' },
+    { id: 83, subject: 'Government', text: 'Essential feature of democracy:', options: { A: 'Free and fair elections', B: 'One-party system', C: 'Military veto', D: 'Censorship' }, answer: 'A' },
+    { id: 84, subject: 'Government', text: 'Supremacy of constitution means:', options: { A: 'All laws must conform', B: 'It is written', C: 'It is rigid', D: 'It is federal' }, answer: 'A' },
+    { id: 85, subject: 'Government', text: 'Local government is tier:', options: { A: 'Third', B: 'Second', C: 'First', D: 'Fourth' }, answer: 'A' },
+    { id: 86, subject: 'Government', text: 'Removal of president from office:', options: { A: 'Impeachment', B: 'Recall', C: 'Censure', D: 'Vote of no confidence' }, answer: 'A' },
+    { id: 87, subject: 'Government', text: 'Universal adult suffrage means:', options: { A: 'All adults can vote', B: 'Only literates', C: 'Only property owners', D: 'Both sexes but not all' }, answer: 'A' },
+    { id: 88, subject: 'Government', text: 'Nigerian citizenship is acquired by:', options: { A: 'Birth, registration, naturalization', B: 'Only birth', C: 'Only marriage', D: 'Only by descent' }, answer: 'A' },
+    { id: 89, subject: 'Government', text: 'No one is above the law:', options: { A: 'Rule of law', B: 'Due process', C: 'Habeas corpus', D: 'Judicial review' }, answer: 'A' },
+    { id: 90, subject: 'Government', text: 'Party that wins election:', options: { A: 'Ruling party', B: 'Opposition', C: 'Minority party', D: 'Coalition' }, answer: 'A' },
+    { id: 91, subject: 'Government', text: 'Delegated legislation is made by:', options: { A: 'Executive agencies', B: 'Parliament', C: 'Courts', D: 'Political parties' }, answer: 'A' },
+    { id: 92, subject: 'Government', text: 'Referendum is:', options: { A: 'Popular vote on an issue', B: 'Election of officials', C: 'Recall of legislators', D: 'Party primary' }, answer: 'A' },
+    { id: 93, subject: 'Government', text: 'Bicameral legislature has:', options: { A: 'Two houses', B: 'One house', C: 'Three houses', D: 'Four houses' }, answer: 'A' },
+    { id: 94, subject: 'Government', text: 'Clifford constitution (1922) introduced:', options: { A: 'Elective principle', B: 'Federalism', C: 'Regional autonomy', D: 'Universal suffrage' }, answer: 'A' },
+    { id: 95, subject: 'Government', text: 'Nigeria’s law-making body:', options: { A: 'National Assembly', B: 'Supreme Court', C: 'Council of State', D: 'Federal Executive' }, answer: 'A' },
+    { id: 96, subject: 'Government', text: 'Political socialization means:', options: { A: 'Learning political values', B: 'Forming parties', C: 'Voting', D: 'Campaigning' }, answer: 'A' },
+    { id: 97, subject: 'Government', text: 'First military coup in Nigeria:', options: { A: '1966', B: '1960', C: '1963', D: '1967' }, answer: 'A' },
+    { id: 98, subject: 'Government', text: 'Fundamental rights are in:', options: { A: 'Constitution', B: 'Criminal code', C: 'Electoral act', D: 'Penal code' }, answer: 'A' },
+    { id: 99, subject: 'Government', text: 'Public corporations provide:', options: { A: 'Essential services', B: 'Profit maximization', C: 'Tax collection', D: 'Defense' }, answer: 'A' },
+    { id: 100, subject: 'Government', text: 'Proportional representation is an:', options: { A: 'Electoral system', B: 'System of govt', C: 'Checks and balances', D: 'Ideology' }, answer: 'A' },
+    { id: 101, subject: 'Government', text: 'Civil service belongs to:', options: { A: 'Executive', B: 'Legislature', C: 'Judiciary', D: 'Parastatals' }, answer: 'A' },
+    { id: 102, subject: 'Government', text: 'First executive president of Nigeria:', options: { A: 'Shehu Shagari', B: 'Azikiwe', C: 'Balewa', D: 'Obasanjo' }, answer: 'A' },
+    { id: 103, subject: 'Government', text: 'Two‑party system is typical of:', options: { A: 'USA', B: 'Nigeria', C: 'China', D: 'France' }, answer: 'A' },
+    { id: 104, subject: 'Government', text: 'Public opinion expressed through:', options: { A: 'Mass media', B: 'Military', C: 'Civil service', D: 'Courts' }, answer: 'A' },
+    { id: 105, subject: 'Government', text: 'Government accountable to people:', options: { A: 'Democracy', B: 'Monarchy', C: 'Autocracy', D: 'Theocracy' }, answer: 'A' },
+
+    /* ========== CRS (106–140) ========== */
+    { id: 106, subject: 'CRS', text: 'God created man on which day?', options: { A: 'Sixth day', B: 'Fifth day', C: 'Third day', D: 'Fourth day' }, answer: 'A' },
+    { id: 107, subject: 'CRS', text: 'First murderer:', options: { A: 'Cain', B: 'Abel', C: 'Lamech', D: 'Jabal' }, answer: 'A' },
+    { id: 108, subject: 'CRS', text: 'Covenant with Abraham:', options: { A: 'Many descendants', B: 'Land only', C: 'Wealth', D: 'Long life' }, answer: 'A' },
+    { id: 109, subject: 'CRS', text: 'Mount of Ten Commandments:', options: { A: 'Sinai', B: 'Horeb', C: 'Zion', D: 'Carmel' }, answer: 'A' },
+    { id: 110, subject: 'CRS', text: 'Wisest king of Israel:', options: { A: 'Solomon', B: 'David', C: 'Saul', D: 'Hezekiah' }, answer: 'A' },
+    { id: 111, subject: 'CRS', text: 'Prophet swallowed by fish:', options: { A: 'Jonah', B: 'Elijah', C: 'Elisha', D: 'Jeremiah' }, answer: 'A' },
+    { id: 112, subject: 'CRS', text: 'Jesus’ birth town:', options: { A: 'Bethlehem', B: 'Nazareth', C: 'Jerusalem', D: 'Cana' }, answer: 'A' },
+    { id: 113, subject: 'CRS', text: 'Number of disciples:', options: { A: 'Twelve', B: 'Seventy', C: 'Eleven', D: 'Thirteen' }, answer: 'A' },
+    { id: 114, subject: 'CRS', text: 'First miracle: turned water into', options: { A: 'Wine', B: 'Oil', C: 'Milk', D: 'Honey' }, answer: 'A' },
+    { id: 115, subject: 'CRS', text: 'Betrayer of Jesus:', options: { A: 'Judas Iscariot', B: 'Peter', C: 'Thomas', D: 'Andrew' }, answer: 'A' },
+    { id: 116, subject: 'CRS', text: 'Place of crucifixion:', options: { A: 'Golgotha', B: 'Gethsemane', C: 'Calvary', D: 'Skull hill' }, answer: 'A' },
+    { id: 117, subject: 'CRS', text: 'Greatest commandment: love', options: { A: 'God and neighbor', B: 'parents', C: 'enemies', D: 'self' }, answer: 'A' },
+    { id: 118, subject: 'CRS', text: 'Pentecost came after ascension how many days?', options: { A: 'Fifty', B: 'Forty', C: 'Ten', D: 'Seven' }, answer: 'A' },
+    { id: 119, subject: 'CRS', text: 'First martyr:', options: { A: 'Stephen', B: 'James', C: 'Peter', D: 'Paul' }, answer: 'A' },
+    { id: 120, subject: 'CRS', text: 'Paul’s former name:', options: { A: 'Saul', B: 'Simon', C: 'Silas', D: 'Sergius' }, answer: 'A' },
+    { id: 121, subject: 'CRS', text: 'Fruit of the Spirit:', options: { A: 'Love, joy, peace', B: 'Power, gifts', C: 'Faith, hope', D: 'Wisdom, knowledge' }, answer: 'A' },
+    { id: 122, subject: 'CRS', text: 'Lost sheep teaches:', options: { A: 'God’s love for sinners', B: 'Judgment', C: 'End times', D: 'Tithing' }, answer: 'A' },
+    { id: 123, subject: 'CRS', text: 'Who baptized Jesus?', options: { A: 'John the Baptist', B: 'Peter', C: 'Andrew', D: 'Philip' }, answer: 'A' },
+    { id: 124, subject: 'CRS', text: 'Shortest Bible verse:', options: { A: 'Jesus wept', B: 'Pray always', C: 'Rejoice evermore', D: 'God is love' }, answer: 'A' },
+    { id: 125, subject: 'CRS', text: 'David’s adultery with:', options: { A: 'Bathsheba', B: 'Abigail', C: 'Michal', D: 'Tamar' }, answer: 'A' },
+    { id: 126, subject: 'CRS', text: 'Good Samaritan teaches:', options: { A: 'Love neighbor', B: 'Prayer', C: 'Fasting', D: 'Almsgiving' }, answer: 'A' },
+    { id: 127, subject: 'CRS', text: 'Lazarus dead for how many days?', options: { A: 'Four', B: 'Three', C: 'Two', D: 'One' }, answer: 'A' },
+    { id: 128, subject: 'CRS', text: 'Garden of arrest:', options: { A: 'Gethsemane', B: 'Eden', C: 'Olives', D: 'Calvary' }, answer: 'A' },
+    { id: 129, subject: 'CRS', text: 'Peter denied Jesus how many times?', options: { A: 'Three', B: 'Seven', C: 'Twice', D: 'Once' }, answer: 'A' },
+    { id: 130, subject: 'CRS', text: 'Author of Acts:', options: { A: 'Luke', B: 'Mark', C: 'Matthew', D: 'John' }, answer: 'A' },
+    { id: 131, subject: 'CRS', text: 'Wages of sin:', options: { A: 'Death', B: 'Hell', C: 'Sickness', D: 'Poverty' }, answer: 'A' },
+    { id: 132, subject: 'CRS', text: 'John 1:1 – In the beginning was the ___', options: { A: 'Word', B: 'Son', C: 'Light', D: 'Life' }, answer: 'A' },
+    { id: 133, subject: 'CRS', text: 'Beatitudes found in:', options: { A: 'Matthew', B: 'Luke', C: 'Mark', D: 'John' }, answer: 'A' },
+    { id: 134, subject: 'CRS', text: 'Paul’s conversion on road to:', options: { A: 'Damascus', B: 'Jerusalem', C: 'Antioch', D: 'Tarsus' }, answer: 'A' },
+    { id: 135, subject: 'CRS', text: 'Jesus fasted for:', options: { A: 'Forty days', B: 'Fourteen days', C: 'Thirty days', D: 'Seven days' }, answer: 'A' },
+    { id: 136, subject: 'CRS', text: 'Woman at well from:', options: { A: 'Samaria', B: 'Galilee', C: 'Judea', D: 'Decapolis' }, answer: 'A' },
+    { id: 137, subject: 'CRS', text: 'Faith without works is:', options: { A: 'Dead', B: 'Vain', C: 'Empty', D: 'Useless' }, answer: 'A' },
+    { id: 138, subject: 'CRS', text: 'God’s love is:', options: { A: 'Unconditional', B: 'Conditional', C: 'Temporary', D: 'Limited' }, answer: 'A' },
+    { id: 139, subject: 'CRS', text: 'First church established in:', options: { A: 'Jerusalem', B: 'Antioch', C: 'Rome', D: 'Ephesus' }, answer: 'A' },
+    { id: 140, subject: 'CRS', text: 'Lord’s Prayer begins: “_____ in heaven”', options: { A: 'Our Father', B: 'Father', C: 'God', D: 'Lord' }, answer: 'A' },
+];
+</script>
+
+<!-- Fixed Header (unchanged boilerplate) -->
+<header class="quiz-header">
+    <div class="quiz-header-container">
+        <div class="quiz-header-left">
+            <button class="btn-icon" id="menuBtn" aria-label="Menu"><i class="fas fa-bars"></i></button>
+            <div class="subject-info">
+                <div class="subject-name" id="subjectName">Arts: ELGC</div>
+                <div class="subject-meta">Question <span id="currentQuestionNum">1</span> of <span id="totalQuestions">140</span></div>
+            </div>
+        </div>
+        <div class="quiz-timer-container" id="quizTimerContainer">
+            <div class="timer-progress-ring"><svg viewBox="0 0 60 60"><circle cx="30" cy="30" r="26" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="4"/><circle id="timerProgressCircle" cx="30" cy="30" r="26" fill="none" stroke="var(--accent)" stroke-width="4" stroke-dasharray="163.36" stroke-dashoffset="0" transform="rotate(-90 30 30)" stroke-linecap="round"/></svg></div>
+            <div class="timer-icon"><i class="fas fa-clock"></i></div>
+            <div class="timer-display" id="timerDisplay">60:00</div>
+        </div>
+        <div class="quiz-header-right">
+            <button class="btn-icon" id="calculatorBtn" aria-label="Calculator"><i class="fas fa-calculator"></i></button>
+            <button class="btn btn-sm btn-danger" id="submitBtn">Submit</button>
+        </div>
+    </div>
+</header>
+
+<div class="quiz-container">
+    <aside class="quiz-sidebar" id="quizSidebar">
+        <div class="sidebar-header"><h3>Navigator</h3><button class="btn-icon btn-close-sidebar" id="closeSidebar"><i class="fas fa-times"></i></button></div>
+        <div class="sidebar-stats"><div class="stat-item"><div class="stat-value" id="answeredCount">0</div><div class="stat-label">Done</div></div><div class="stat-item"><div class="stat-value" id="unansweredCount">140</div><div class="stat-label">Left</div></div><div class="stat-item"><div class="stat-value" id="flaggedCount">0</div><div class="stat-label">Flagged</div></div></div>
+        <div class="question-palette" id="questionPalette"></div>
+        <div class="sidebar-legend"><div class="legend-item"><span class="legend-dot current"></span> Current</div><div class="legend-item"><span class="legend-dot answered"></span> Answered</div><div class="legend-item"><span class="legend-dot flagged"></span> Flagged</div><div class="legend-item"><span class="legend-dot"></span> Unanswered</div></div>
+        <div style="padding:1rem;border-top:1px solid var(--border,#1e1e2e);margin-top:auto;"><a href="art_clusters.html" class="btn btn-secondary" style="width:100%;text-align:center;" onclick="return confirm('Leave quiz? Progress will be lost.')">&#8592; Back</a></div>
+    </aside>
+    <main class="quiz-main">
+        <div class="question-card" id="questionCard">
+            <div class="question-header"><div class="question-number">Question <span id="questionNumber">1</span></div><button class="btn-flag" id="flagBtn"><i class="far fa-flag"></i> Flag</button></div>
+            <div class="question-text" id="questionText">Loading...</div>
+            <div class="options-container" id="optionsContainer"></div>
+            <div class="question-explanation hidden" id="questionExplanation"><div class="explanation-header"><i class="fas fa-lightbulb"></i> Explanation</div><div class="explanation-content" id="explanationContent"></div></div>
+        </div>
+        <div class="quiz-navigation"><button class="btn btn-secondary" id="prevBtn" disabled><i class="fas fa-arrow-left"></i> Previous</button><button class="btn btn-secondary" id="clearBtn"><i class="fas fa-eraser"></i> Clear</button><button class="btn btn-primary" id="nextBtn">Next <i class="fas fa-arrow-right"></i></button></div>
+    </main>
+</div>
+
+<div class="mobile-palette-trigger" id="mobilePaletteBtn"><i class="fas fa-th"></i> <span>Questions</span></div>
+
+<!-- Modals -->
+<div class="modal-overlay hidden" id="submitModal"><div class="modal"><div class="modal-header"><h3>Submit Test?</h3><button class="btn-icon" id="closeSubmitModal"><i class="fas fa-times"></i></button></div><div class="modal-body"><div class="submit-summary"><div class="summary-item"><span class="summary-label">Total</span><span class="summary-value" id="modalTotalQuestions">140</span></div><div class="summary-item"><span class="summary-label">Answered</span><span class="summary-value answered-text" id="modalAnsweredCount">0</span></div><div class="summary-item"><span class="summary-label">Unanswered</span><span class="summary-value warning-text" id="modalUnansweredCount">140</span></div><div class="summary-item"><span class="summary-label">Time Left</span><span class="summary-value" id="modalTimeRemaining">60:00</span></div></div><div class="warning-message"><i class="fas fa-exclamation-triangle"></i><span>You cannot change answers after submission.</span></div></div><div class="modal-footer"><button class="btn btn-secondary" id="cancelSubmitBtn">Cancel</button><button class="btn btn-danger" id="confirmSubmitBtn"><i class="fas fa-check"></i> Submit</button></div></div></div>
+<div class="modal-overlay hidden" id="timeUpModal"><div class="modal"><div class="modal-header"><h3>⏳ Time's Up!</h3></div><div class="modal-body"><p style="color:var(--muted);font-size:0.9rem;">Your time has run out. Answers recorded.</p></div><div class="modal-footer"><button class="btn btn-primary" id="viewResultsBtn">View Results</button></div></div></div>
+<div class="modal-overlay hidden" id="calculatorModal"><div class="modal calculator-modal"><div class="modal-header"><h3>Calculator</h3><button class="btn-icon" id="closeCalculatorModal"><i class="fas fa-times"></i></button></div><div class="modal-body"><div class="calculator"><input type="text" class="calculator-display" id="calcDisplay" value="0" readonly><div class="calculator-buttons"><button class="calc-btn" data-action="clear">C</button><button class="calc-btn" data-action="delete">←</button><button class="calc-btn" data-action="divide">÷</button><button class="calc-btn" data-action="multiply">×</button><button class="calc-btn" data-value="7">7</button><button class="calc-btn" data-value="8">8</button><button class="calc-btn" data-value="9">9</button><button class="calc-btn" data-action="subtract">−</button><button class="calc-btn" data-value="4">4</button><button class="calc-btn" data-value="5">5</button><button class="calc-btn" data-value="6">6</button><button class="calc-btn" data-action="add">+</button><button class="calc-btn" data-value="1">1</button><button class="calc-btn" data-value="2">2</button><button class="calc-btn" data-value="3">3</button><button class="calc-btn calc-equals" data-action="equals" style="grid-row:span 2">=</button><button class="calc-btn" data-value="0" style="grid-column:span 2">0</button><button class="calc-btn" data-value=".">.</button></div></div></div></div></div>
+
+<!-- same quiz-app.js assumed; linked externally. -->
+<script src="quiz-app.js"></script>
+</body>
+</html>
